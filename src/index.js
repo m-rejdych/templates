@@ -1,4 +1,4 @@
-const { copy, exists, readdir } = require('fs-extra');
+const { copy, copyFile, exists, readdir, lstat } = require('fs-extra');
 const path = require('path');
 
 const main = async () => {
@@ -13,16 +13,21 @@ const main = async () => {
     throw new Error('Template does not exist.');
   }
 
-  const filesToCopy = await readdir(templatePath);
-  await Promise.all(
-    filesToCopy
-      .filter((filename) => filename !== 'node_modules')
-      .map(async (filename) => {
-        const filePath = path.join(templatePath, filename);
-        const destPath = path.join(process.cwd(), filename);
-        await copy(filePath, destPath);
-      }),
-  );
+
+  if ((await lstat(templatePath)).isDirectory()) {
+    const filesToCopy = await readdir(templatePath);
+    await Promise.all(
+      filesToCopy
+        .filter((filename) => !['node_modules', 'package-lock.json'].includes(filename))
+        .map(async (filename) => {
+          const filePath = path.join(templatePath, filename);
+          const destPath = path.join(process.cwd(), filename);
+          await copy(filePath, destPath);
+        }),
+    );
+  } else {
+    await copyFile(templatePath, path.join(process.cwd(), template));
+  }
 };
 
 main().catch((error) => {
