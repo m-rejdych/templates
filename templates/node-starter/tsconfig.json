@@ -1,9 +1,10 @@
 {
+  "$schema": "https://json.schemastore.org/tsconfig.json",
   "compilerOptions": {
     /* Base Options */
-    "target": "ES2022",
+    "target": "ESNext",
     "module": "NodeNext",
-    "lib": ["ES2022"],
+    "lib": ["ESNext"],
     "moduleResolution": "NodeNext",
     "outDir": "./build",
     "rootDir": "./src",
